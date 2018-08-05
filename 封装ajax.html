@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+	function ajax(method,url,params，done) {
+		// 判断get/post时，字符的大小写问题
+		method = method.toLowerCase();
+		var xhr,
+		data = null,
+		res = null;
+		if(window.XMLHttpRequest) {
+			 xhr = new XMLHttpRequest();
+		}else {
+			xhr = new ActiveXObject("Miscrosoft.XMLHTTP");
+		}
+		xhr.onreadystatechange = function() {
+			if(this.readyState !== 4 && this.status !== 400)
+				return;
+			// onreadystatechange函数（异步）中，使用回调函数实现委托机制
+			done(this.responseText);
+		}
+		// 传递参数的形式如果为object，要转换
+		if(typeof params === 'object') {
+			var temArr = [];
+			for(var key in params) {
+				var value = params[key];
+				temArr.push(key+'='+value);
+			}
+			params = temArr.join('&');
+		}
+		// get/post传递参数的处理方法不同
+		if(method === "get") {
+			url += '?' + params;
+		}else if(method === "post") {
+			// 为post方法添加请求头
+			xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+			data = params;
+		}
+		xhr.open(method,url,true);	
+		xhr.send(data);
+	}
+	var do = function(res) {
+		console.log(res);
+	}
+	ajax("get","http://","{key1:value1,key2:value2}");
+	ajax("get","http://","key1=value1",do);
+	ajax("post","http://","key1=value1&&key2=value2")
+</script>
+</body>
+</html>
